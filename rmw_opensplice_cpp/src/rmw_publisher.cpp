@@ -170,13 +170,12 @@ rmw_create_publisher(
 
   publisher->implementation_identifier = opensplice_cpp_identifier;
   publisher->data = publisher_info;
-  publisher->topic_name = reinterpret_cast<const char *>(
-    rmw_allocate(sizeof(char) * strlen(topic_name) + 1));
+  publisher->topic_name = reinterpret_cast<const char *>(rmw_allocate(strlen(topic_name) + 1));
   if (!publisher->topic_name) {
     RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
-  memcpy(const_cast<char *>(publisher->topic_name), topic_name, strlen(topic_name) + 1);
+  strncpy(const_cast<char*>(publisher->topic_name), topic_name, strlen(topic_name) + 1);
 
   return publisher;
 fail:
