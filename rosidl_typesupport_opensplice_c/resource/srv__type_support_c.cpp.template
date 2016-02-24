@@ -35,11 +35,6 @@
 #include "rosidl_typesupport_opensplice_cpp/requester.hpp"
 #include "rosidl_typesupport_opensplice_cpp/responder.hpp"
 
-// TODO Wow
-
-#include "@(spec.pkg_name)/srv/dds_opensplice_c/@(req_header_file_name)__type_support_c.cpp"
-#include "@(spec.pkg_name)/srv/dds_opensplice_c/@(res_header_file_name)__type_support_c.cpp"
-
 @{
 # Same as @(spec.pkg_name)::srv::dds_::@(spec.srv_name)
 __dds_msg_type_prefix = "{spec.pkg_name}::srv::dds_::{spec.srv_name}".format(spec=spec)
@@ -394,11 +389,17 @@ send_request__@(spec.srv_name)(
   void * untyped_requester, const void * untyped_ros_request, int64_t * sequence_number)
 {
   using SampleT = rosidl_typesupport_opensplice_cpp::Sample<@(__dds_msg_type_prefix)_Request_>;
-  using ROSRequestT = @(spec.pkg_name)__srv__@(spec.srv_name)_Request;
 
   SampleT request;
-  auto ros_request = reinterpret_cast<const ROSRequestT *>(untyped_ros_request);
-  @(spec.pkg_name)__@(spec.srv_name)__request::convert_ros_message_to_dds(*ros_request, request.data());
+  const message_type_support_callbacks_t * callbacks =
+    static_cast<const message_type_support_callbacks_t *>(ROSIDL_GET_TYPE_SUPPORT_FUNCTION(
+      @(spec.pkg_name), srv, @(spec.srv_name)_Request
+    )()->data);
+  const char * err_msg = callbacks->convert_ros_to_dds(untyped_ros_request, &request.data());
+  if (err_msg != 0) {
+    return err_msg;
+  }
+
 
   using RequesterT = rosidl_typesupport_opensplice_cpp::Requester<
     @(__dds_msg_type_prefix)_Request_,
@@ -425,9 +426,12 @@ take_request__@(spec.srv_name)(
     @(__dds_msg_type_prefix)_Request_,
     @(__dds_msg_type_prefix)_Response_
   >;
-  using ROSRequestT = @(spec.pkg_name)__srv__@(spec.srv_name)_Request;
 
-  auto ros_request = static_cast<ROSRequestT *>(untyped_ros_request);
+  const message_type_support_callbacks_t * callbacks =
+    static_cast<const message_type_support_callbacks_t *>(ROSIDL_GET_TYPE_SUPPORT_FUNCTION(
+      @(spec.pkg_name), srv, @(spec.srv_name)_Request
+    )()->data);
+
   auto request_header = static_cast<rmw_request_id_t *>(untyped_ros_request_header);
 
   auto responder = reinterpret_cast<ResponderT *>(untyped_responder);
@@ -439,7 +443,10 @@ take_request__@(spec.srv_name)(
   }
 
   if (*taken) {
-    @(spec.pkg_name)__@(spec.srv_name)__request::convert_dds_message_to_ros(request.data(), *ros_request);
+    error_string = callbacks->convert_dds_to_ros(&request.data(), untyped_ros_request);
+    if (error_string) {
+      return error_string;
+    }
 
     request_header->sequence_number = request.sequence_number_;
     std::memcpy(
@@ -460,10 +467,15 @@ send_response__@(spec.srv_name)(
   void * untyped_responder, const void * untyped_ros_request_header,
   const void * untyped_ros_response)
 {
-  using ROSResponseT = @(spec.pkg_name)__srv__@(spec.srv_name)_Response;
   rosidl_typesupport_opensplice_cpp::Sample<@(__dds_msg_type_prefix)_Response_> response;
-  auto ros_response = reinterpret_cast<const ROSResponseT *>(untyped_ros_response);
-  @(spec.pkg_name)__@(spec.srv_name)__response::convert_ros_message_to_dds(*ros_response, response.data());
+  const message_type_support_callbacks_t * callbacks =
+    static_cast<const message_type_support_callbacks_t *>(ROSIDL_GET_TYPE_SUPPORT_FUNCTION(
+      @(spec.pkg_name), srv, @(spec.srv_name)_Response
+    )()->data);
+  const char * err_msg = callbacks->convert_ros_to_dds(untyped_ros_response, &response.data());
+  if (err_msg != 0) {
+    return err_msg;
+  }
 
   auto request_header = reinterpret_cast<const rmw_request_id_t *>(untyped_ros_request_header);
 
@@ -485,8 +497,10 @@ take_response__@(spec.srv_name)(
   void * untyped_requester, void * untyped_ros_request_header, void * untyped_ros_response,
   bool * taken)
 {
-  using ROSResponseT = @(spec.pkg_name)__srv__@(spec.srv_name)_Response;
-  auto ros_response = static_cast<ROSResponseT *>(untyped_ros_response);
+  const message_type_support_callbacks_t * callbacks =
+    static_cast<const message_type_support_callbacks_t *>(ROSIDL_GET_TYPE_SUPPORT_FUNCTION(
+      @(spec.pkg_name), srv, @(spec.srv_name)_Response
+    )()->data);
 
   using RequesterT = rosidl_typesupport_opensplice_cpp::Requester<
     @(__dds_msg_type_prefix)_Request_,
@@ -504,8 +518,10 @@ take_response__@(spec.srv_name)(
 
     req_id->sequence_number = response.sequence_number_;
 
-    @(spec.pkg_name)__@(spec.srv_name)__response::convert_dds_message_to_ros(
-      response.data(), *ros_response);
+    error_string = callbacks->convert_dds_to_ros(&response.data(), untyped_ros_response);
+    if (error_string) {
+      return error_string;
+    }
     return nullptr;
   }
 
@@ -578,18 +594,3 @@ static service_type_support_callbacks_t callbacks = {
   &take_response__@(spec.srv_name),
 };
 
-static rosidl_service_type_support_t handle = {
-  rosidl_typesupport_opensplice_cpp::typesupport_opensplice_identifier,
-  &callbacks
-};
-
-
-template<>
-ROSIDL_TYPESUPPORT_OPENSPLICE_CPP_EXPORT
-const rosidl_service_type_support_t *
-get_service_type_support_handle_opensplice<@(spec.pkg_name)__srv__@(spec.srv_name)>()
-{
-  return &@(spec.pkg_name)::srv::typesupport_opensplice_cpp::handle;
-}
-
-// TODO ROSIDL_GET_TYPE_SUPPORT_FUNCTION???
