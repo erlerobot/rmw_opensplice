@@ -293,7 +293,7 @@ rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
     rmw_free(subscription_info);
   }
   if (subscription->topic_name) {
-    rmw_free(const_cast<char*>(subscription->topic_name));
+    rmw_free(const_cast<char *>(subscription->topic_name));
   }
   rmw_subscription_free(subscription);
   return result;

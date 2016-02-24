@@ -269,7 +269,7 @@ rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
     rmw_free(publisher_info);
   }
   if (publisher->topic_name) {
-    rmw_free(const_cast<char*>(publisher->topic_name));
+    rmw_free(const_cast<char *>(publisher->topic_name));
   }
   rmw_publisher_free(publisher);
   return result;
