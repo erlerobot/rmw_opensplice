@@ -170,6 +170,7 @@ rmw_create_publisher(
 
   publisher->implementation_identifier = opensplice_cpp_identifier;
   publisher->data = publisher_info;
+  publisher->topic_name = topic_name;
 
   return publisher;
 fail:

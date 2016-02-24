@@ -173,6 +173,7 @@ rmw_create_subscription(
 
   subscription->implementation_identifier = opensplice_cpp_identifier;
   subscription->data = subscriber_info;
+  subscription->topic_name = topic_name;
   return subscription;
 fail:
   if (dds_subscriber) {
