@@ -175,7 +175,7 @@ rmw_create_publisher(
     RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
-  strncpy(const_cast<char*>(publisher->topic_name), topic_name, strlen(topic_name) + 1);
+  strncpy(const_cast<char *>(publisher->topic_name), topic_name, strlen(topic_name) + 1);
 
   return publisher;
 fail:

@@ -179,7 +179,7 @@ rmw_create_subscription(
     RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
-  strncpy(const_cast<char*>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
+  strncpy(const_cast<char *>(subscription->topic_name), topic_name, strlen(topic_name) + 1);
 
   return subscription;
 fail:
