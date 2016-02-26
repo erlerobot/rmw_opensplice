@@ -184,7 +184,9 @@ convert_ros_to_dds(const void * untyped_ros_message, void * untyped_dds_message)
 @[end if]@
 @[if field.type.type == 'string']@
       const rosidl_generator_c__String * str = &ros_i;
-      if (str->capacity == 0 || str->capacity <= str->size) {
+      if (!(str->capacity == 0 && str->size == 0) && str->capacity <= str->size) {
+        std::string error = std::string("capacity <= size: ") + std::to_string(str->capacity) + ", " + std::to_string(str->size);
+        fprintf(stderr, "capacity: %zu, size: %zu\n", str->capacity, str->size);
         return "string capacity not greater than size";
       }
       if (str->data[str->size - 1] == '\0') {
@@ -206,7 +208,8 @@ convert_ros_to_dds(const void * untyped_ros_message, void * untyped_dds_message)
     }
 @[elif field.type.type == 'string']@
     const rosidl_generator_c__String * str = &ros_message->@(field.name);
-    if (str->capacity == 0 || str->capacity <= str->size) {
+    //if (/*str->capacity == 0 ||*/ str->capacity <= str->size) {
+    if (!(str->capacity == 0 && str->size == 0) && str->capacity <= str->size) {
       return "string capacity not greater than size";
     }
     if (str->data[str->size - 1] == '\0') {

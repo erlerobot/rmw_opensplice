@@ -219,6 +219,11 @@ class TemplateDataWriter<Sample<@(__dds_msg_type_prefix)@(suffix)_>>
 
 // TODO extern C
 
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
 const char *
 register_types__@(spec.srv_name)(
   void * untyped_participant, const char * request_type_name, const char * response_type_name)
@@ -579,11 +584,6 @@ destroy_responder__@(spec.srv_name)(void * untyped_responder, void (* deallocato
   _deallocator(responder);
   return nullptr;
 }
-
-#if defined(__cplusplus)
-extern "C"
-{
-#endif
 
 static service_type_support_callbacks_t __callbacks = {
   "@(spec.pkg_name)",

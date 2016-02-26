@@ -179,6 +179,7 @@ configure_file(
   @ONLY
 )
 list(APPEND _generated_msg_files "${_visibility_control_file}")
+list(APPEND _generated_srv_files "${_visibility_control_file}")
 
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   if(NOT "${_generated_msg_files}${_generated_external_msg_files} " STREQUAL " ")
