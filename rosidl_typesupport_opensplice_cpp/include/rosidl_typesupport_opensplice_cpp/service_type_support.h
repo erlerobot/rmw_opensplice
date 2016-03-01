@@ -30,7 +30,7 @@ typedef struct service_type_support_callbacks_t
   const char * (*create_requester)(
     void * participant, const char * service_name, void ** requester, void ** reader,
     const void * datareader_qos, const void * datawriter_qos, void * (*allocator)(size_t));
-  // De-allocatea a requester
+  // De-allocate a requester
   // The deallocator should match the allocator passed to create_requester.
   // Returns NULL if the requester was successfully destroyed, otherwise an error string.
   // Passing NULL for the deallocator will result in free being used.
