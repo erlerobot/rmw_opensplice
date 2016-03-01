@@ -13,7 +13,6 @@
 #include <iostream>
 #include <sstream>
 
-#include <rosidl_generator_c/service_type_support.h>
 // This is defined in the rosidl_typesupport_opensplice_c package and
 // is in the include/rosidl_typesupport_opensplice_c/impl folder.
 #include <rosidl_generator_c/service_type_support.h>
