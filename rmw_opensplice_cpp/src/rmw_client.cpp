@@ -151,7 +151,7 @@ rmw_create_client(
     RMW_SET_ERROR_MSG("failed to allocate memory for node name");
     goto fail;
   }
-  strncpy(const_cast<char *>(client->service_name), service_name, strlen(service_name) + 1);
+  memcpy(const_cast<char *>(client->service_name), service_name, strlen(service_name) + 1);
   return client;
 fail:
   if (response_datareader) {
