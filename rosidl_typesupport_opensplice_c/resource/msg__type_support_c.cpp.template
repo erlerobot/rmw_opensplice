@@ -187,8 +187,7 @@ convert_ros_to_dds(const void * untyped_ros_message, void * untyped_dds_message)
       if (!str) {
         return "string field was not allocated";
       }
-      // TODO revert
-      if (/*!(str->capacity == 0 && str->size == 0) &&*/ str->capacity <= str->size) {
+      if (str->capacity == 0 || str->capacity <= str->size) {
         return "string capacity not greater than size";
       }
       if (!str->data) {
@@ -216,8 +215,7 @@ convert_ros_to_dds(const void * untyped_ros_message, void * untyped_dds_message)
     if (!str) {
       return "string field was not allocated";
     }
-    //if (/*str->capacity == 0 ||*/ str->capacity <= str->size) {
-    if (!(str->capacity == 0 && str->size == 0) && str->capacity <= str->size) {
+    if (str->capacity == 0 || str->capacity <= str->size) {
       return "string capacity not greater than size";
     }
     if (!str->data) {
