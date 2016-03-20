@@ -14,6 +14,7 @@
 
 #include <ccpp_dds_dcps.h>
 #include <dds_dcps.h>
+#include <time.h>
 
 #include "rmw/allocators.h"
 #include "rmw/error_handling.h"
@@ -391,6 +392,7 @@ rmw_destroy_node(rmw_node_t * node)
 rmw_ros_meta_t * 
 rmw_get_node_names(void)
 {  
+  clock_t begin_time = clock();
   // Use the current ROS_DOMAIN_ID.
   char * ros_domain_id = nullptr;
   const char * env_var = "ROS_DOMAIN_ID";
@@ -411,10 +413,14 @@ rmw_get_node_names(void)
   }
 #endif
 
+  std::cout << "(rmw_opensplice_cpp) -----> env. variables stuff: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
+
   // Create a ROS middleware node that will be used to 
   // fetch other participant's data from the "ros_meta" topic
   rmw_node_t * rmw_node;
   rmw_node = rmw_create_node("get_node_names", domain_id);
+  std::cout << "(rmw_opensplice_cpp) -----> rmw_create_node: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
+
 
   // Do not use builtin topics but instead, make use of the "ros_meta"
   //  topic create for this purpose.
@@ -431,6 +437,8 @@ rmw_get_node_names(void)
                                                       &qos_profile,
                                                       false);
 
+  std::cout << "(rmw_opensplice_cpp) -----> rmw_create_subscription: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
+
   rmw_ros_meta_t* ros_meta_data = (rmw_ros_meta_t*)rmw_allocate(sizeof(rmw_ros_meta_t));
   ros_meta_data->count = 0;
   ros_meta_data->node_names = NULL;
@@ -445,6 +453,7 @@ rmw_get_node_names(void)
   introspection_msgs__msg__ROSMeta__init(&ros_message);
   bool taken = true;
   int count = 0;
+  std::cout << "(rmw_opensplice_cpp) -----> introspection_msgs__msg__ROSMeta__init: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
 
   //timer variables
   struct timeval a, b;
@@ -457,7 +466,9 @@ rmw_get_node_names(void)
   bool timeout = false;
 
   while(!timeout || taken){
-    rmw_ret_t ret = rmw_take(subs, &ros_message, &taken); 
+    //begin_time = clock();    
+    rmw_ret_t ret = rmw_take(subs, &ros_message, &taken);
+    //std::cout << "rmw_take: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
     if (ret != RMW_RET_OK) {
       RMW_SET_ERROR_MSG("failed to take message");    
     }else{
@@ -511,7 +522,10 @@ rmw_get_node_names(void)
     if(diff > 0.001){
       timeout = true;
     }
+    //std::cout << "while_loop: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
   }
+  std::cout << "(rmw_opensplice_cpp) -----> finished while loop: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
+
 
   introspection_msgs__msg__ROSMeta__fini(&ros_message);
 
@@ -522,6 +536,7 @@ rmw_get_node_names(void)
   if (rmw_destroy_node(rmw_node) != RMW_RET_OK) {
     RMW_SET_ERROR_MSG("failed to delete participant");
   }
+  std::cout << "(rmw_opensplice_cpp) -----> freeing memory: "<< float( clock () - begin_time ) /  CLOCKS_PER_SEC << "\n";
   return ros_meta_data;
 }
 
