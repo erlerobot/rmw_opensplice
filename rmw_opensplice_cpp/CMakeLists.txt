@@ -26,7 +26,6 @@ endif()
 
 find_package(rmw REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(introspection_msgs REQUIRED)
 
 ament_export_dependencies(
@@ -63,7 +62,6 @@ add_library(rmw_opensplice_cpp SHARED
 )
 ament_target_dependencies(rmw_opensplice_cpp
   "introspection_msgs"
-  "std_msgs"
   "rmw"
   "rosidl_generator_cpp"
   "rosidl_typesupport_opensplice_c"
